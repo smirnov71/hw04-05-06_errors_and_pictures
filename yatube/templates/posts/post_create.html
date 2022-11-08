@@ -1,0 +1,109 @@
+<!DOCTYPE html> 
+<html lang="ru">
+{% extends 'base.html' %}
+{% load thumbnail %}
+  <head>    
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="icon" href="../img/fav/fav.ico" type="image">
+    <link rel="apple-touch-icon" sizes="180x180" href="../img/fav/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="../img/fav/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="../img/fav/favicon-16x16.png">
+    <meta name="msapplication-TileColor" content="#da532c">
+    <meta name="theme-color" content="#ffffff">
+    <link rel="stylesheet" href="../css/bootstrap.min.css">
+    {% block title %}
+      {% if is_edit %}
+        Редактировать запись
+      {% else %}
+        Добавить запись
+      {% endif %}  
+    {% endblock %}
+  </head>
+  <body>	   
+    <header>
+      {% block header %}Последние обновления на сайте{% endblock %}
+    </header>
+    <main>
+      {% block content %}
+      <div class="container py-5">
+        <div class="row justify-content-center">
+          <div class="col-md-8 p-5">
+            <div class="card">
+              <div class="card-header">       
+                {% if is_edit %}
+                  Редактирование
+                {% else %}
+                  Новый пост
+                {% endif %}            
+              </div>
+              <div class="card-body">        
+                <form method="post" enctype="multipart/form-data" action="
+                {% if is_edit %}
+                  {% url 'posts:post_edit' form.instance.pk %}
+                {% else %}
+                  {% url 'posts:post_create' %}
+                {% endif %}">
+                {% csrf_token %}
+                  <div class="form-group row my-3 p-3">
+                    <label for="id_text">
+                      Текст поста                  
+                      <span class="required text-danger" >*</span>                  
+                    </label>
+                    {% if is_edit %}
+                      {{ form.text }}
+                    {% else %}
+                      <textarea name="text" cols="40" rows="10" class="form-control" required id="id_text">
+                      </textarea>                      
+                    {% endif %}
+                    <small id="id_text-help" class="form-text text-muted">
+                      {% if is_edit %}
+                        Измените текст
+                      {% else %}
+                        Текст нового поста
+                      {% endif %}
+                    </small>                  
+                  </div>            
+                  <input type="image" src="/media/medved-iz-kustov_97135269_orig_.png">  
+                  <div class="form-group row my-3 p-3">
+                    <label for="id_group">
+                      Группа                  
+                    </label>
+                    {% if is_edit %}
+                      {{ form.group }} 
+                    {% else %}
+                      <select name="group" class="form-control" id="id_group">
+                        <option value="" selected>---------</option>
+                        <option value="1">Группа: Horseback Riders</option>
+                        <option value="2">Группа: Firearm Shooters</option>
+                        <option value="3">Группа: Fishers and Fowlers</option>
+                        <option value="4">Группа: Eaters and Drinkers</option>
+                      </select>
+                    {% endif %}
+
+                    <small id="id_group-help" class="form-text text-muted">
+                      Группа, к которой будет относиться пост
+                    </small>
+                  </div>
+                  <div class="d-flex justify-content-end">
+                    <button type="submit" class="btn btn-primary">
+                      {% if is_edit %}
+                        Сохранить
+                      {% else %}
+                        Добавить
+                      {% endif %}               
+                    </button>
+                  </div>
+                </form>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      {% endblock %}
+    </main>
+    <footer class="border-top text-center py-3">
+      <p>© 2021 Copyright <span style="color:red">Ya</span>tube</p>    
+    </footer>
+  </body>
+</html>
