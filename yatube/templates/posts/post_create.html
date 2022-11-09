@@ -38,7 +38,7 @@
                 {% endif %}            
               </div>
               <div class="card-body">        
-                <form method="post" enctype="multipart/form-data" action="
+                <form method="post" action="
                 {% if is_edit %}
                   {% url 'posts:post_edit' form.instance.pk %}
                 {% else %}
@@ -64,7 +64,7 @@
                       {% endif %}
                     </small>                  
                   </div>            
-                  <input type="image" src="/media/medved-iz-kustov_97135269_orig_.png">  
+                  <form method="post" enctype="multipart/form-data">
                   <div class="form-group row my-3 p-3">
                     <label for="id_group">
                       Группа                  
@@ -80,7 +80,6 @@
                         <option value="4">Группа: Eaters and Drinkers</option>
                       </select>
                     {% endif %}
-
                     <small id="id_group-help" class="form-text text-muted">
                       Группа, к которой будет относиться пост
                     </small>
@@ -93,6 +92,20 @@
                         Добавить
                       {% endif %}               
                     </button>
+                    <div class="form-group row my-3 p-3">
+                      <label for="id_image">
+                        Картинка                      
+                      </label>
+                      <input type="file" name="image" accept="image/*" class="form-control" id="id_image">
+                      <button type="submit" class="btn btn-primary">
+                        {% if is_edit %}
+                          Сохранить
+                        {% else %}
+                          Добавить
+                        {% endif %}               
+                      </button>                   
+                    </div>
+                  
                   </div>
                 </form>
               </div>
