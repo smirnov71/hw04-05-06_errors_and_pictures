@@ -66,6 +66,7 @@
           <p>
             {{ post.text }} 
           </p>
+          {% include 'posts/includes/comments.html' %}
           <!-- эта кнопка видна только автору -->
           {% if post.author == request.user %}
             <a class="btn btn-primary" href="{% url 'posts:post_edit' post_id=post.pk %}">

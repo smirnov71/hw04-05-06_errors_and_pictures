@@ -22,7 +22,14 @@ urlpatterns = [
 
     # Изменение записи
     path('posts/<post_id>/edit/', views.post_edit, name='post_edit'),
+
+    # Комментарий к записи
+    path('posts/<int:post_id>/comment/', views.add_comment, name='add_comment'),
+
 ]
+
+handler404 = 'core.views.page_not_found'
+ 
 # в режиме DEBUG=True брать картинки из директории, указанной в MEDIA_ROOT
 if settings.DEBUG:
     urlpatterns += static(

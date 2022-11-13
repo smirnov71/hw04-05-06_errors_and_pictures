@@ -1,4 +1,4 @@
-# posts/tests/tests_form.py
+# posts/tests/test_forms.py
 import tempfile
 from http import HTTPStatus
 from posts.models import Group, Post

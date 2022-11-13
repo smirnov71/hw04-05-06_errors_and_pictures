@@ -1,6 +1,6 @@
-from .models import Post, Group, User
+from .models import Post, Group, User, Comment
 from django.shortcuts import redirect, render, get_object_or_404
-from .forms import PostForm
+from .forms import PostForm, CommentForm
 from django.contrib.auth.decorators import login_required
 from .utils import paginate_page
 # Create your views here.
@@ -45,11 +45,15 @@ def profile(request, username):
 def post_detail(request, post_id):
     post = get_object_or_404(Post, pk=post_id)
     author = post.author
-    # post_count = Post.objects.filter(author=author).count()
-
+    # Получаем набор комментариев для поста с запрошенным номером
+    comments = Comment.objects.select_related("post")
+    page_obj = paginate_page(request, comments)
+    # Отдаем в словаре контекста
     context = {
         'post': post,
-        'author': author
+        'author': author,
+        'form': CommentForm(request.POST or None),
+        'page_obj': page_obj,
     }
     return render(request, 'posts/post_detail.html', context)
 
@@ -93,3 +97,19 @@ def post_edit(request, post_id):
         'is_edit': True,
     }
     return render(request, 'posts/post_create.html', context)
+
+@login_required
+def add_comment(request, post_id):
+    # Получите пост
+    post = get_object_or_404(
+        Post,
+        id=post_id,
+        author__username=request.user
+    )
+    form = CommentForm(request.POST or None)
+    if form.is_valid():
+        comment = form.save(commit=False)
+        comment.author = request.user
+        comment.post = post
+        comment.save()
+    return redirect('posts:post_detail', post_id=post_id)
