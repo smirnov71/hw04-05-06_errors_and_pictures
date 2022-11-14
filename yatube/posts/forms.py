@@ -21,16 +21,6 @@ class PostForm(forms.ModelForm):
 class CommentForm(forms.ModelForm):
     class Meta:
         model = Comment
-        fields = ('post', 'author', 'text', 'created')
-        labels = {
-            "post": "Пост",
-            "author": "Комментатор",
-            "text": "Текст",
-            "created": "Дата  комментария"
-        }
-
-        help_texts = {
-            "text": "Текст нового поста",
-            "group": "Группа, к которой будет относиться пост",
-            "image": "Иллюстрация к посту"
-        }
+        fields = ('text',)
+        labels = {"text": "Текст",}
+        help_texts = {"text": "Текст коммента",}

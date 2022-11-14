@@ -3,6 +3,7 @@ from django.shortcuts import redirect, render, get_object_or_404
 from .forms import PostForm, CommentForm
 from django.contrib.auth.decorators import login_required
 from .utils import paginate_page
+
 # Create your views here.
 
 
@@ -47,13 +48,11 @@ def post_detail(request, post_id):
     author = post.author
     # Получаем набор комментариев для поста с запрошенным номером
     comments = Comment.objects.select_related("post")
-    page_obj = paginate_page(request, comments)
-    # Отдаем в словаре контекста
     context = {
         'post': post,
         'author': author,
         'form': CommentForm(request.POST or None),
-        'page_obj': page_obj,
+        'comments': comments,
     }
     return render(request, 'posts/post_detail.html', context)
 

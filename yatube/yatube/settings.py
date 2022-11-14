@@ -35,6 +35,12 @@ ALLOWED_HOSTS = [
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/2.2/howto/static-files/
 
+CACHES = {
+    'default': {
+        'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
+    }
+}
+
 CSRF_FAILURE_VIEW = 'core.views.csrf_failure'
  
 # Application definition
