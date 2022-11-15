@@ -39,6 +39,7 @@ def profile(request, username):
     context = {
         'author': author,
         'page_obj': page_obj,
+        'following':True
     }
     return render(request, 'posts/profile.html', context)
 
@@ -112,3 +113,23 @@ def add_comment(request, post_id):
         comment.post = post
         comment.save()
     return redirect('posts:post_detail', post_id=post_id)
+
+
+
+@login_required
+def follow_index(request):
+    # информация о текущем пользователе доступна в переменной request.user
+    # ...
+    context = {}
+    return render(request, 'posts/follow.html', context)
+
+@login_required
+def profile_follow(request, username):
+    # Подписаться на автора
+    ...
+
+@login_required
+def profile_unfollow(request, username):
+    # Дизлайк, отписка
+    ...
+ 
