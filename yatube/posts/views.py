@@ -3,7 +3,7 @@ from django.shortcuts import redirect, render, get_object_or_404
 from .forms import PostForm, CommentForm
 from django.contrib.auth.decorators import login_required
 from .utils import paginate_page
-
+from django.views.decorators.csrf import csrf_exempt
 # Create your views here.
 
 
@@ -99,12 +99,12 @@ def post_edit(request, post_id):
     return render(request, 'posts/post_create.html', context)
 
 @login_required
+@csrf_exempt
 def add_comment(request, post_id):
     # Получите пост
     post = get_object_or_404(
         Post,
         id=post_id,
-        author__username=request.user
     )
     form = CommentForm(request.POST or None)
     if form.is_valid():
@@ -113,8 +113,6 @@ def add_comment(request, post_id):
         comment.post = post
         comment.save()
     return redirect('posts:post_detail', post_id=post_id)
-
-
 
 @login_required
 def follow_index(request):
