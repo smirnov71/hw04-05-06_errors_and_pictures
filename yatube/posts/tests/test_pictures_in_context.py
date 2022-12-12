@@ -10,7 +10,6 @@ from django. core. cache import cache
 from django.core.files.uploadedfile import SimpleUploadedFile
 
 from posts.models import Group, Post
-from ..forms import PostForm
 from datetime import date
 
 User = get_user_model()

@@ -48,7 +48,7 @@ def post_detail(request, post_id):
     post = get_object_or_404(Post, pk=post_id)
     author = post.author
     # Получаем набор комментариев для поста с запрошенным номером
-    comments = Comment.objects.select_related("post")
+    comments = Comment.objects.filter(post_id=post_id)
     context = {
         'post': post,
         'author': author,

@@ -57,7 +57,6 @@ INSTALLED_APPS = [
     'about.apps.AboutConfig',
     'core.apps.CoreConfig',
     'sorl.thumbnail',
-    'yatube.settings',
 ]
 
 MEDIA_URL = '/media/'
