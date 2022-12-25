@@ -1,3 +1,4 @@
+# posts/tests/test_pictures_in_context.py
 import shutil
 import tempfile
 
@@ -82,7 +83,7 @@ class PostPictureTests(TestCase):
             self.assertIn('image', response.context)
 
     def test_post_create(self):
-        """Создание поста с картинкой создаёт запись в базе данных."""
+        """Отправка поста с картинкой создаёт запись в базе данных."""
 
         form_data = {
             'group': self.group.id,
