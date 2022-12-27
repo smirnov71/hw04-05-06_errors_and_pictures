@@ -46,3 +46,4 @@ class PostCreateFormTests(TestCase):
         """Неавторизованнй НЕ может комментировать"""
         comment_response = self.unauth_client.comment(reverse('posts:add_comment'))
         self.assertEqual(comment_response.status_code, HTTPStatus.FOUND)
+        
