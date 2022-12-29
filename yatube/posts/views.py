@@ -118,7 +118,12 @@ def add_comment(request, post_id):
 def follow_index(request):
     # информация о текущем пользователе доступна в переменной request.user
     # ...
-    context = {}
+    posts = Post.objects.select_related("group", "author")
+    page_obj = paginate_page(request, posts)
+    # Отдаем в словаре контекста
+    context = {
+        'page_obj': page_obj,
+    }
     return render(request, 'posts/follow.html', context)
 
 @login_required
