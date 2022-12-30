@@ -1,4 +1,4 @@
-from .models import Post, Group, User, Comment
+from .models import Post, Group, User, Comment, Follow
 from django.shortcuts import redirect, render, get_object_or_404
 from .forms import PostForm, CommentForm
 from django.contrib.auth.decorators import login_required
@@ -39,7 +39,7 @@ def profile(request, username):
     context = {
         'author': author,
         'page_obj': page_obj,
-        'following':True
+        'following': True
     }
     return render(request, 'posts/profile.html', context)
 
@@ -117,8 +117,8 @@ def add_comment(request, post_id):
 @login_required
 def follow_index(request):
     # информация о текущем пользователе доступна в переменной request.user
-    # ...
-    posts = Post.objects.select_related("group", "author")
+    # фильтруем посты, где пользователь запроса подписан на автора поста
+    posts = Post.objects.filter(author__following__user=request.user)
     page_obj = paginate_page(request, posts)
     # Отдаем в словаре контекста
     context = {
@@ -129,10 +129,17 @@ def follow_index(request):
 @login_required
 def profile_follow(request, username):
     # Подписаться на автора
-    ...
+    author = get_object_or_404(User, username=username)
+    is_follower = Follow.objects.filter(user=request.user, author=author)
+    if request.user != author and not is_follower.exists():
+        new_follow = Follow(user=request.user, author=author)
+        new_follow.save()
+    return redirect('posts:profile', author.username)
 
 @login_required
 def profile_unfollow(request, username):
     # Дизлайк, отписка
-    ...
- 
+    author = get_object_or_404(User, username=username)
+    unfollow = Follow.objects.get(user=request.user, author=author)
+    unfollow.delete()
+    return redirect('posts:profile', author.username)
