@@ -2,11 +2,13 @@ from .models import Post, Group, User, Comment, Follow
 from django.shortcuts import redirect, render, get_object_or_404
 from .forms import PostForm, CommentForm
 from django.contrib.auth.decorators import login_required
-from .utils import paginate_page
 from django.views.decorators.csrf import csrf_exempt
+from django.views.decorators.cache import cache_page
+from .utils import paginate_page
 # Create your views here.
 
 
+@cache_page(20, key_prefix='index_page')
 def index(request):
     # Получаем набор записей для страницы с запрошенным номером
     posts = Post.objects.select_related("group", "author")
@@ -35,11 +37,15 @@ def profile(request, username):
     author = get_object_or_404(User, username=username)
     posts = author.posts.select_related("author")
     page_obj = paginate_page(request, posts)
+    is_follower = Follow.objects.filter(user=request.user, author=author)
+    following = False
+    if is_follower:
+        following = True
 
     context = {
         'author': author,
         'page_obj': page_obj,
-        'following': True
+        'following': following
     }
     return render(request, 'posts/profile.html', context)
 
