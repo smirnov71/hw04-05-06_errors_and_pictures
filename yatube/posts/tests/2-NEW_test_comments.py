@@ -31,7 +31,7 @@ class PostCreateFormTests(TestCase):
             follow=True
         )
         # Создаём комент
-        comment_response = self.authorized_client.comment(
+        comment_response = self.authorized_client.get(
             reverse('posts:add_comment'),
             data=form_data,
             follow=True
@@ -39,11 +39,11 @@ class PostCreateFormTests(TestCase):
         # Проверяем, увеличилось ли число коментов
         self.assertEqual(Comment.objects.count(), 1)
         comment = Comment.objects.first()
-        self.assertEqual(comment.text, 'Текст комментария')
+        self.assertEqual(comment.text, 'Теcтовый  коммент')
         self.assertEqual(comment.author, self.user)
 
     def test_unauth_cant_comment(self):
         """Неавторизованнй НЕ может комментировать"""
-        comment_response = self.unauth_client.comment(reverse('posts:add_comment'))
+        comment_response = self.unauth_client.get(reverse('posts:add_comment'))
         self.assertEqual(comment_response.status_code, HTTPStatus.FOUND)
         
