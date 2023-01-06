@@ -58,6 +58,7 @@ class PostsURLTests(TestCase):
             f'/posts/{self.post.id}/': 'posts/post_detail.html',
             f'/posts/{self.post.id}/edit/': 'posts/post_create.html',
             '/create/': 'posts/post_create.html',
+            '/unexisting_page/': 'core/404.html',
         }
         for address, template in templates_url_names.items():
             # АВТОРИЗОВАННЫЙ ПОЛЬЗОВАТЕЛЬ

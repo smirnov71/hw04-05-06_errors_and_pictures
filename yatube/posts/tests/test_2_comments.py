@@ -31,7 +31,7 @@ class PostCreateFormTests(TestCase):
             follow=True
         )
         # Создаём комент
-        comment_response = self.authorized_client.get(
+        comment_response = self.authorized_client.post(
             reverse('posts:add_comment'),
             data=form_data,
             follow=True
