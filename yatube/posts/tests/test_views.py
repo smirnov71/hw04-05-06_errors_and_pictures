@@ -269,7 +269,7 @@ class CacheViewsTest(TestCase):
 
     def test_cache_index(self):
         """Проверка хранения и очищения кэша для index."""
-        response = CacheViewsTest.authorized_client.get(reverse('index'))
+        response = CacheViewsTest.authorized_client.get(reverse('posts:index'))
         posts = response.content
         Post.objects.create(
             text='test_new_post',
@@ -285,7 +285,7 @@ class CacheViewsTest(TestCase):
             'Не возвращает кэшированную страницу.'
         )
         cache.clear()
-        response_new = CacheViewsTest.authorized_client.get(reverse('index'))
+        response_new = CacheViewsTest.authorized_client.get(reverse('posts:index'))
         new_posts = response_new.content
         self.assertNotEqual(old_posts, new_posts, 'Нет сброса кэша.')
 
@@ -334,7 +334,7 @@ class FollowViewsTest(TestCase):
         author = FollowViewsTest.author
         client.get(
             reverse(
-                'profile_follow',
+                'posts:profile_follow',
                 args=[author.username]
             )
         )
@@ -354,7 +354,7 @@ class FollowViewsTest(TestCase):
         author = FollowViewsTest.author
         client.get(
             reverse(
-                'profile_unfollow',
+                'posts:profile_unfollow',
                 args=[author.username]
             ),
 
@@ -374,12 +374,12 @@ class FollowViewsTest(TestCase):
         group = FollowViewsTest.group
         client.get(
             reverse(
-                'profile_follow',
+                'posts:profile_follow',
                 args=[author.username]
             )
         )
         response_old = client.get(
-            reverse('follow_index')
+            reverse('posts:follow_index')
         )
         old_posts = response_old.context.get(
             'page'
@@ -401,7 +401,7 @@ class FollowViewsTest(TestCase):
         )
         cache.clear()
         response_new = client.get(
-            reverse('follow_index')
+            reverse('posts:follow_index')
         )
         new_posts = response_new.context.get(
             'page'
@@ -422,7 +422,7 @@ class FollowViewsTest(TestCase):
         author = FollowViewsTest.author
         group = FollowViewsTest.group
         response_old = client.get(
-            reverse('follow_index')
+            reverse('posts:follow_index')
         )
         old_posts = response_old.context.get(
             'page'
@@ -444,7 +444,7 @@ class FollowViewsTest(TestCase):
         )
         cache.clear()
         response_new = client.get(
-            reverse('follow_index')
+            reverse('posts:follow_index')
         )
         new_posts = response_new.context.get(
             'page'
