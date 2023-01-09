@@ -4,7 +4,7 @@ from django.test import Client, TestCase
 from django.urls import reverse
 from django. core. cache import cache
 
-from posts.models import Group, Post
+from posts.models import Group, Post, Follow
 from ..forms import PostForm
 from datetime import date
 
@@ -288,3 +288,174 @@ class CacheViewsTest(TestCase):
         response_new = CacheViewsTest.authorized_client.get(reverse('index'))
         new_posts = response_new.content
         self.assertNotEqual(old_posts, new_posts, 'Нет сброса кэша.')
+
+
+class FollowViewsTest(TestCase):
+    @classmethod
+    def setUpClass(cls):
+        super().setUpClass()
+        cls.guest_client = Client()
+        cls.author = User.objects.create_user(
+            username='test_author'
+        )
+        cls.auth_author_client = Client()
+        cls.auth_author_client.force_login(cls.author)
+
+        cls.user_fol = User.objects.create_user(
+            username='test_user_fol'
+        )
+        cls.authorized_user_fol_client = Client()
+        cls.authorized_user_fol_client.force_login(
+            cls.user_fol
+        )
+
+        cls.user_unfol = User.objects.create_user(
+            username='test_user_unfol'
+        )
+        cls.authorized_user_unfol_client = Client()
+        cls.authorized_user_unfol_client.force_login(
+            cls.user_unfol
+        )
+        cls.group = Group.objects.create(
+            title='test_group',
+            slug='test-slug',
+            description='test_description'
+        )
+        cls.post = Post.objects.create(
+            text='test_post',
+            group=cls.group,
+            author=cls.author
+        )
+
+    def test_follow(self):
+        """Тест работы подписки на автора."""
+        client = FollowViewsTest.authorized_user_unfol_client
+        user = FollowViewsTest.user_unfol
+        author = FollowViewsTest.author
+        client.get(
+            reverse(
+                'profile_follow',
+                args=[author.username]
+            )
+        )
+        follower = Follow.objects.filter(
+            user=user,
+            author=author
+        ).exists()
+        self.assertTrue(
+            follower,
+            'Не работает подписка на автора'
+        )
+
+    def test_unfollow(self):
+        """Тест работы отписки от автора."""
+        client = FollowViewsTest.authorized_user_unfol_client
+        user = FollowViewsTest.user_unfol
+        author = FollowViewsTest.author
+        client.get(
+            reverse(
+                'profile_unfollow',
+                args=[author.username]
+            ),
+
+        )
+        follower = Follow.objects.filter(
+            user=user,
+            author=author
+        ).exists()
+        self.assertFalse(
+            follower,
+            'Не работает отписка от автора'
+        )
+
+    def test_new_author_post_for_follower(self):
+        client = FollowViewsTest.authorized_user_fol_client
+        author = FollowViewsTest.author
+        group = FollowViewsTest.group
+        client.get(
+            reverse(
+                'profile_follow',
+                args=[author.username]
+            )
+        )
+        response_old = client.get(
+            reverse('follow_index')
+        )
+        old_posts = response_old.context.get(
+            'page'
+        ).object_list
+        self.assertEqual(
+            len(response_old.context.get('page').object_list),
+            1,
+            'Не загружается правильное колличество старых постов'
+        )
+        self.assertIn(
+            FollowViewsTest.post,
+            old_posts,
+            'Старый пост не верен'
+        )
+        new_post = Post.objects.create(
+            text='test_new_post',
+            group=group,
+            author=author
+        )
+        cache.clear()
+        response_new = client.get(
+            reverse('follow_index')
+        )
+        new_posts = response_new.context.get(
+            'page'
+        ).object_list
+        self.assertEqual(
+            len(response_new.context.get('page').object_list),
+            2,
+            'Нету нового поста'
+        )
+        self.assertIn(
+            new_post,
+            new_posts,
+            'Новый пост не верен'
+        )
+
+    def test_new_author_post_for_unfollower(self):
+        client = FollowViewsTest.authorized_user_unfol_client
+        author = FollowViewsTest.author
+        group = FollowViewsTest.group
+        response_old = client.get(
+            reverse('follow_index')
+        )
+        old_posts = response_old.context.get(
+            'page'
+        ).object_list
+        self.assertEqual(
+            len(response_old.context.get('page').object_list),
+            0,
+            'Не загружается правильное колличество старых постов'
+        )
+        self.assertNotIn(
+            FollowViewsTest.post,
+            old_posts,
+            'Старый пост не должен загружаться'
+        )
+        new_post = Post.objects.create(
+            text='test_new_post',
+            group=group,
+            author=author
+        )
+        cache.clear()
+        response_new = client.get(
+            reverse('follow_index')
+        )
+        new_posts = response_new.context.get(
+            'page'
+        ).object_list
+        self.assertEqual(
+            len(response_new.context.get('page').object_list),
+            0,
+            'Новый пост не должен появляться'
+        )
+        self.assertNotIn(
+            new_post,
+            new_posts,
+            'Новый пост не должен появляться'
+        )
