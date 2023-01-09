@@ -35,7 +35,14 @@ class PostPictureTests(TestCase):
         super().setUpClass()
 
         cls.user_creator = User.objects.create(username='user_cr')
-        
+        cls.user_uncreator = User.objects.create(username='user_un')
+
+        cls.group = Group.objects.create(
+            title='test_group',
+            slug='test-slug',
+            description='test_description'
+        )
+
         cls.post = Post.objects.create(
             text='Тестовый текст',
             author=cls.user_creator,
@@ -95,7 +102,7 @@ class PostPictureTests(TestCase):
         # Проверяем, сработал ли редирект
         self.assertRedirects(
             response,
-            reverse('posts:profile', kwargs={'username': self.user})
+            reverse('posts:profile', kwargs={'username': self.user_creator})
         )
         # Проверяем, увеличилось ли число постов
         self.assertEqual(Post.objects.count(), 1)
@@ -108,7 +115,7 @@ class PostPictureTests(TestCase):
         """Редактирование поста с картинкой создаёт запись в базе данных."""
         post = Post.objects.create(
             text='Тестовый текст',
-            author=self.user,
+            author=self.user_creator,
             group=self.group,
             image=test_image,
         )
@@ -128,7 +135,7 @@ class PostPictureTests(TestCase):
         self.assertEqual(Post.objects.count(), 1)
         post = Post.objects.first()
         self.assertEqual(post.text, new_post_text)
-        self.assertEqual(post.author, self.user)
+        self.assertEqual(post.author, self.user_creator)
         self.assertEqual(post.group, new_group)
 
         old_group_response = self.authorized_client.get(
